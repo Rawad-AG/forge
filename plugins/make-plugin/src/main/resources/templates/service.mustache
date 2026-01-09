@@ -1,0 +1,14 @@
+package {{package}};
+
+import org.springframework.stereotype.Service;
+import lombok.AllArgsConstructor;
+
+import {{repoPackage}}.{{className}}Repository;
+
+
+@Service
+@AllArgsConstructor
+public class {{className}}Service {
+    private final {{className}}Repository {{classNameLower}}Repository;
+    
+}

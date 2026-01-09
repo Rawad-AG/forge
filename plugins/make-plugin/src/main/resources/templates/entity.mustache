@@ -1,0 +1,26 @@
+package {{package}};
+
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+
+@Getter
+@Setter
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@ToString(callSuper = true, onlyExplicitlyIncluded = true)
+@Entity(name = "{{className}}")
+@Table(name = "{{classNameLower}}s")
+public class {{className}}Entity {
+
+    @Id
+    @SequenceGenerator(name = "{{classNameLower}}_id_sequence", sequenceName = "{{classNameLower}}_id_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "{{classNameLower}}_id_sequence")
+    @EqualsAndHashCode.Include
+    @ToString.Include
+    private Long id;
+
+}
