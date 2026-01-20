@@ -104,6 +104,16 @@ This directory is copied when the archetype command is executed, with variables 
 
 ---
 
+### 4. Requester
+
+A Forge-native offline alternative to Postman.
+
+Requester is a CLI-based HttpClient that enables you to send requests in a similar way to `postman`.
+
+you can even create and manage collections, environments variables, and all of that in easy, configurable way.
+
+---
+
 ## Design Philosophy
 
 - Forge is engine + plugins

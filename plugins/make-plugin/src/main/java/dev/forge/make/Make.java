@@ -1,5 +1,6 @@
 package dev.forge.make;
 
+import dev.forge.engine.core.ForgeEngine;
 import dev.forge.engine.core.ForgePlugin;
 import picocli.CommandLine;
 
@@ -17,6 +18,12 @@ public class Make implements ForgePlugin {
 
     @Override
     public int execute(String[] args) {
-        return new CommandLine(new MakeCommand()).execute(args);
+        try {
+            int exitCode = new CommandLine(new MakeCommand()).execute(args);
+            return exitCode;
+        } catch (Exception e) {
+            ForgeEngine.context().console().fatal(e.getMessage());
+            return 1;
+        }
     }
 }

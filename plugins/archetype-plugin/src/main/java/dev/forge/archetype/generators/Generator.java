@@ -14,7 +14,7 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
-import dev.forge.engine.cli.input.Prompts;
+import dev.forge.engine.cli.input.Prompter;
 import dev.forge.engine.cli.output.Console;
 import dev.forge.engine.config.ForgeConfigLoader;
 import dev.forge.engine.core.ForgeEngine;
@@ -26,7 +26,7 @@ public class Generator {
 
     private final ForgeConfigLoader config = ForgeEngine.context().config();
     private final Console console = ForgeEngine.context().console();
-    private final Prompts prompter = ForgeEngine.context().prompter();
+    private final Prompter prompter = ForgeEngine.context().prompter();
 
     public void generate(Path targetDir, String template) {
         try {

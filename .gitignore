@@ -1,21 +1,11 @@
-**/target/
-**/dependency-reduced-pom.xml
-*.class
-*.jar
-*.war
-*.ear
+target/
+dependency-reduced-pom.xml
 
 *.iml
 .idea/
 *.code-workspace
 .vscode/
 *.log
-
-.DS_Store
-Thumbs.db
-
-
-
 
 *.tmp
 *.swp

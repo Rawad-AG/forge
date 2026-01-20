@@ -1,5 +1,8 @@
 package dev.forge.engine.cli.input;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Locale;
 
 import org.jline.reader.LineReader;
@@ -7,11 +10,11 @@ import org.jline.reader.LineReader;
 import dev.forge.engine.cli.context.TerminalContext;
 import dev.forge.engine.core.ForgeEngine;
 
-public final class Prompts {
+public final class Prompter {
 
     private final TerminalContext ctx;
 
-    public Prompts(TerminalContext ctx) {
+    public Prompter(TerminalContext ctx) {
         this.ctx = ctx;
     }
 
@@ -180,6 +183,22 @@ public final class Prompts {
         }
     }
 
+    public String chooseRequired(String question, Collection<String> options) {
+        if (!ctx.isInteractive())
+            throw new IllegalStateException("Required choice in non-interactive mode");
+
+        String opts = String.join(" | ", options);
+
+        while (true) {
+            String input = readLine(question + " [" + opts + "]: ");
+            for (String option : options)
+                if (option.equals(input))
+                    return option;
+
+            ForgeEngine.context().console().println("Invalid choice. Expected one of: " + opts);
+        }
+    }
+
     public String chooseOrDefault(String question, String defaultValue, String... options) {
         if (!ctx.isInteractive())
             return defaultValue;
@@ -193,6 +212,54 @@ public final class Prompts {
 
             for (String option : options)
                 if (option.equals(input))
+                    return option;
+
+            ForgeEngine.context().console().println("Invalid choice. Expected one of: " + opts);
+        }
+    }
+
+    public String chooseOrDefault(String question, String defaultValue, Collection<String> options) {
+        if (!ctx.isInteractive())
+            return defaultValue;
+
+        String opts = String.join(" | ", options);
+
+        while (true) {
+            String input = readLine(question + " [" + opts + "] [" + defaultValue + "]: ");
+            if (input == null || input.isBlank())
+                return defaultValue;
+
+            for (String option : options)
+                if (option.equals(input))
+                    return option;
+
+            ForgeEngine.context().console().println("Invalid choice. Expected one of: " + opts);
+        }
+    }
+
+    public <T extends Enum<T>> T chooseOrDefault(String question, T defaultValue, Class<T> enumClass) {
+        if (!ctx.isInteractive())
+            return defaultValue;
+
+        T[] values = enumClass.getEnumConstants();
+        if (values == null || values.length == 0) {
+            throw new IllegalArgumentException("Provided class is not an enum or has no constants");
+        }
+
+        List<T> options = new ArrayList<>(values.length);
+        for (T value : values) {
+            options.add(value);
+        }
+
+        String opts = String.join(" | ", options.stream().map(s -> s.name()).toList());
+
+        while (true) {
+            String input = readLine(question + " [" + opts + "] [" + defaultValue + "]: ");
+            if (input == null || input.isBlank())
+                return defaultValue;
+
+            for (var option : options)
+                if (option.name().equals(input))
                     return option;
 
             ForgeEngine.context().console().println("Invalid choice. Expected one of: " + opts);

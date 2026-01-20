@@ -3,7 +3,7 @@ package dev.forge.archetype;
 import java.nio.file.Path;
 
 import dev.forge.archetype.generators.Generator;
-import dev.forge.engine.cli.input.Prompts;
+import dev.forge.engine.cli.input.Prompter;
 import dev.forge.engine.core.ForgeEngine;
 import lombok.Setter;
 import picocli.CommandLine.Command;
@@ -20,7 +20,7 @@ public class ArchetypeCommand implements Runnable {
     @Parameters(index = "0", arity = "0..1", description = "the template you want to create")
     private String template;
 
-    private final Prompts prompter = ForgeEngine.context().prompter();
+    private final Prompter prompter = ForgeEngine.context().prompter();
 
     @Override
     public void run() {

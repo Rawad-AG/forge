@@ -53,6 +53,11 @@ public final class Console {
         System.exit(1);
     }
 
+    public void fatal(Exception... exs) {
+        error("something went wrong", exs);
+        System.exit(1);
+    }
+
     private void logToFile(String msg, Exception e) {
         try {
             File forgeDir = new File(System.getProperty("user.home"), ".forge");
@@ -75,17 +80,32 @@ public final class Console {
     }
 
     public void println(String msg) {
-        ctx.out().println(msg);
-        ctx.out().flush();
+        if (msg != null && !msg.isBlank()) {
+            ctx.out().println(msg);
+            ctx.out().flush();
+        }
     }
 
     public void print(String msg) {
-        ctx.out().print(msg);
+        if (msg != null && !msg.isBlank()) {
+            ctx.out().print(msg);
+            ctx.out().flush();
+        }
+    }
+
+    public void backR() {
+        ctx.out().print("\r");
+        ctx.out().flush();
+    }
+
+    public void backT() {
+        ctx.out().print("\t");
         ctx.out().flush();
     }
 
     public void line() {
-        println("");
+        ctx.out().print("\n");
+        ctx.out().flush();
     }
 
     public void progressbar(double current, double total, String... prefixes) {
@@ -122,7 +142,7 @@ public final class Console {
                     break;
                 }
             }
-            ctx.out().print("\r");
+            backR();
         });
 
         loaderThread.start();

@@ -1,14 +1,14 @@
-package dev.forge.plugins_manager;
+package dev.forge.requester;
 
 import dev.forge.engine.core.ForgeEngine;
 import dev.forge.engine.core.ForgePlugin;
 import picocli.CommandLine;
 
-public class PluginManager implements ForgePlugin {
+public class Requester implements ForgePlugin {
 
     @Override
     public String getName() {
-        return "plugins-manager";
+        return "requester";
     }
 
     @Override
@@ -19,7 +19,7 @@ public class PluginManager implements ForgePlugin {
     @Override
     public int execute(String[] args) {
         try {
-            int exitCode = new CommandLine(new PluginManagerCommand()).execute(args);
+            int exitCode = new CommandLine(new RequesterCommand()).execute(args);
             return exitCode;
         } catch (Exception e) {
             ForgeEngine.context().console().fatal(e.getMessage());

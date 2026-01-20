@@ -7,7 +7,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.forge.engine.cli.input.Prompts;
+import dev.forge.engine.cli.input.Prompter;
 import dev.forge.engine.cli.output.Console;
 import dev.forge.engine.core.ForgeEngine;
 import dev.forge.engine.core.ForgePlugin;
@@ -17,7 +17,7 @@ import picocli.CommandLine.Command;
 @Command(name = "load", description = "Load the current plugin to the forge directory")
 public class LoadCommand implements Runnable {
     private final Console console = ForgeEngine.context().console();
-    private final Prompts prompter = ForgeEngine.context().prompter();
+    private final Prompter prompter = ForgeEngine.context().prompter();
 
     @Override
     public void run() {

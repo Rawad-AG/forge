@@ -43,10 +43,6 @@ public final class ForgeEngine {
         }
     }
 
-    public static ForgeConfigLoader config() {
-        return config;
-    }
-
     public static PluginLoader pluginLoader() {
         return pluginLoader;
     }
