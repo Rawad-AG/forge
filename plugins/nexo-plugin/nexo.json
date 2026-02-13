@@ -1,0 +1,108 @@
+{
+  "env": {
+    "basePackage": "{{BASE_PACKAGE}}",
+    "useLombok": true,
+    "generateMappers": true,
+    "dtoSuffix": "DTO",
+    "javaVersion": 17
+  },
+  "entities": [
+    {
+      "name": "{{ENTITY_NAME}}",
+      "tableName": "{{OPTIONAL_TABLE_NAME}}",
+      "fields": [
+        {
+          "name": "{{FIELD_NAME}}",
+          "type": "string",
+          "scope": ["PERSISTENCE", "DTO_IN", "DTO_OUT"],
+          "persistence": {
+            "columnName": "{{OPTIONAL_DB_NAME}}",
+            "columnDefinition": "VARCHAR(255) DEFAULT 'N/A'",
+            "nullable": true,
+            "unique": false,
+            "length": 255,
+            "precision": 0,
+            "scale": 0,
+            "insertable": true,
+            "updatable": true
+          },
+          "validation": {
+            "notNull": true,
+            "notEmpty": false,
+            "size": { "min": 2, "max": 100 },
+            "pattern": "^[A-Z]*$",
+            "email": false,
+            "min": 0,
+            "max": 1000
+          }
+        }
+      ],
+      "indexes": [
+        {
+          "columnList": ["{{FIELD_1}}", "{{FIELD_2}}"],
+          "unique": false
+        }
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "type": "MANY_TO_ONE",
+      "bidirectional": true,
+      "from": {
+        "entity": "{{CHILD_ENTITY}}",
+        "name": "{{PARENT_REFERENCE_FIELD}}",
+        "cascade": ["PERSIST", "MERGE"]
+      },
+      "to": {
+        "entity": "{{PARENT_ENTITY}}",
+        "name": "{{CHILD_COLLECTION_FIELD}}"
+      }
+    },
+    {
+      "type": "ONE_TO_MANY",
+      "bidirectional": true,
+      "from": {
+        "entity": "{{PARENT_ENTITY}}",
+        "name": "{{CHILD_COLLECTION_FIELD}}",
+        "cascade": ["ALL"],
+        "orphanRemoval": true
+      },
+      "to": {
+        "entity": "{{CHILD_ENTITY}}",
+        "name": "{{PARENT_REFERENCE_FIELD}}"
+      }
+    },
+    {
+      "type": "ONE_TO_ONE",
+      "bidirectional": true,
+      "from": {
+        "entity": "{{ENTITY_A}}",
+        "name": "{{REFERENCE_TO_B}}"
+      },
+      "to": {
+        "entity": "{{ENTITY_B}}",
+        "name": "{{REFERENCE_TO_A}}"
+      }
+    },
+    {
+      "type": "MANY_TO_MANY",
+      "bidirectional": true,
+      "from": {
+        "entity": "{{ENTITY_A}}",
+        "name": "{{COLLECTION_OF_B}}"
+      },
+      "to": {
+        "entity": "{{ENTITY_B}}",
+        "name": "{{COLLECTION_OF_A}}"
+      },
+      "table": "{{JOIN_TABLE_NAME}}"
+    }
+  ],
+  "enums": [
+    {
+      "name": "{{ENUM_NAME}}",
+      "values": ["VALUE_A", "VALUE_B"]
+    }
+  ]
+}

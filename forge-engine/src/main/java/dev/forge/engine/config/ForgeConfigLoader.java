@@ -74,12 +74,24 @@ public final class ForgeConfigLoader {
         return conf.getInt(path);
     }
 
+    public int getInt(String path, int def) {
+        return hasPath(path) ? getInt(path) : def;
+    }
+
     public long getLong(String path) {
         return conf.getLong(path);
     }
 
+    public long getLong(String path, long def) {
+        return hasPath(path) ? getLong(path) : def;
+    }
+
     public double getDouble(String path) {
         return conf.getDouble(path);
+    }
+
+    public double getDouble(String path, double def) {
+        return hasPath(path) ? getDouble(path) : def;
     }
 
     public String getString(String path) {

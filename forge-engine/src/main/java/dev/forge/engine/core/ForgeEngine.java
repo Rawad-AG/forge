@@ -51,4 +51,13 @@ public final class ForgeEngine {
         return context;
     }
 
+    public static void debug(ForgePlugin plugin, String[] args) {
+        TerminalContext ctx = TerminalContext.create();
+        config = new ForgeConfigLoader();
+        pluginLoader = new PluginLoader(config);
+        context = new ExecutionContext(ctx, config);
+
+        plugin.execute(args);
+    }
+
 }

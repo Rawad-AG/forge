@@ -22,7 +22,7 @@ public class MakeService implements Runnable {
     @Override
     public void run() {
         name = StringUtils.capitalize(name);
-        ServiceMaker.make(pkg, name, template, override);
+        new ServiceMaker().make(pkg, name, template, override);
 
     }
 }

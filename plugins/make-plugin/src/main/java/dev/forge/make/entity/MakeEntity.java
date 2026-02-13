@@ -22,6 +22,6 @@ public class MakeEntity implements Runnable {
     @Override
     public void run() {
         name = StringUtils.capitalize(name);
-        EntityMaker.make(pkg, name, template, override);
+        new EntityMaker().make(pkg, name, template, override);
     }
 }

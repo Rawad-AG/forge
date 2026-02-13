@@ -22,6 +22,6 @@ public class MakeRepository implements Runnable {
     @Override
     public void run() {
         name = StringUtils.capitalize(name);
-        RepositoryMaker.make(pkg, name, template, override);
+        new RepositoryMaker().make(pkg, name, template, override);
     }
 }

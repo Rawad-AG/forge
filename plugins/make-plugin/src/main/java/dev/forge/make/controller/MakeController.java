@@ -22,6 +22,6 @@ public class MakeController implements Runnable {
     @Override
     public void run() {
         name = StringUtils.capitalize(name);
-        ControllerMaker.make(pkg, name, template, override);
+        new ControllerMaker().make(pkg, name, template, override);
     }
 }

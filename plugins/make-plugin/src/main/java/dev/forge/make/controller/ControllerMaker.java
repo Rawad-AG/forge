@@ -1,39 +1,49 @@
 package dev.forge.make.controller;
 
-import java.nio.file.Path;
 import java.util.Map;
 
-import dev.forge.engine.config.ForgeConfigLoader;
-import dev.forge.engine.core.ForgeEngine;
-import dev.forge.make.generators.FileMaker;
-import dev.forge.make.utils.ProjectUtils;
+import dev.forge.make.generators.Maker;
 
-public class ControllerMaker {
-    private static final ForgeConfigLoader config = ForgeEngine.context().config();
+public final class ControllerMaker extends Maker {
 
-    public static void make(String pkg, String name, String template, boolean override) {
-        Path base = Path.of("src", "main", "java");
-        pkg = pkg != null && !pkg.isBlank() ? pkg : ProjectUtils.getRootPackage();
+    public void make(String pkg, String name, String template, boolean override) {
+        super.make(pkg, name, template, override);
+    }
 
-        if (pkg == null || pkg.isBlank())
-            throw new RuntimeException("unable to auto detect the package. please pass the --pkg option");
+    @Override
+    protected String packageKey() {
+        return "make.packages.controller";
+    }
 
-        for (String part : pkg.split("\\."))
-            base = base.resolve(part);
+    @Override
+    protected String suffixKey() {
+        return "make.suffix.controller";
+    }
 
-        base = base.resolve(config.getString("make.packages.controller", "controllers"));
+    @Override
+    protected String templateKey() {
+        return "make.templates.controller";
+    }
 
-        String suffix = config.getBoolean("make.addSuffix", true) ? "Controller.java" : ".java";
+    @Override
+    protected String defaultPackage() {
+        return "controllers";
+    }
 
-        base = base.resolve(name + suffix);
-        template = template != null && !template.isBlank() ? template
-                : config.getString("make.templates.controller", "templates/controller.mustache");
+    @Override
+    protected String defaultSuffix() {
+        return "Controller";
+    }
+
+    @Override
+    protected String defaultTemplate() {
+        return "templates/controller.mustache";
+    }
+
+    @Override
+    protected Map<String, Object> extraContext(String pkg) {
         String servicePkg = config.getString("make.packages.service", "services");
-
-        new FileMaker().override(override).generate(base, template, Map.of(
-                "package", pkg + "." + config.getString("make.packages.controller", "controllers"),
-                "className", name,
-                "classNameLower", name.toLowerCase(),
-                "servicePackage", pkg + "." + servicePkg));
+        return Map.of(
+                "servicePackage", pkg + "." + servicePkg);
     }
 }

@@ -21,12 +21,15 @@ public class MakeAll implements Runnable {
     @Option(names = { "--pkg", "-p" })
     private String pkg;
 
+    @Option(names = { "--template", "-t" })
+    private String template;
+
     @Override
     public void run() {
         name = StringUtils.capitalize(name);
-        RepositoryMaker.make(pkg, name, name, override);
-        ServiceMaker.make(pkg, name, name, override);
-        ControllerMaker.make(pkg, name, name, override);
-        EntityMaker.make(pkg, name, name, override);
+        new RepositoryMaker().make(pkg, name, template, override);
+        new ServiceMaker().make(pkg, name, template, override);
+        new ControllerMaker().make(pkg, name, template, override);
+        new EntityMaker().make(pkg, name, template, override);
     }
 }
