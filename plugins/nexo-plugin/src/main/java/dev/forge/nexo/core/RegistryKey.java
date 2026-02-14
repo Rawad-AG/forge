@@ -1,15 +1,17 @@
 package dev.forge.nexo.core;
 
 public enum RegistryKey {
-    NONE,
 
-    /* java.io.file object represents the json file to be parsed */
+    /* File object represents the json file to be parsed */
     FILE,
 
-    /*
-     * dev.forge.nexo.core.phases.parser.mapping.Root object represents the
-     * json file after mapping
-     */
-    Parsed_Root
+    /* Root object represents the json file after mapping */
+    Parsed_Root,
+
+    /* Model objects for template rendering */
+    Entity_Models,
+
+    /* Template rendered outputs */
+    Template_Outputs
 
 }

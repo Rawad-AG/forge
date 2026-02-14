@@ -3,14 +3,22 @@ package dev.forge.nexo.core;
 import java.nio.file.Path;
 import java.util.List;
 
+import dev.forge.nexo.core.phases.modeler.Modeler;
 import dev.forge.nexo.core.phases.normalizer.Normalizer;
+import dev.forge.nexo.core.phases.outputer.Outputer;
 import dev.forge.nexo.core.phases.parser.ParsePhase;
+import dev.forge.nexo.core.phases.templater.Templater;
+import dev.forge.nexo.core.phases.validator.Validator;
 
 public class NexoEngine {
     private final Path path;
     private final List<Runnable> phases = List.of(
             new ParsePhase(),
-            new Normalizer());
+            new Normalizer(),
+            new Validator(),
+            new Modeler(),
+            new Templater(),
+            new Outputer());
 
     public NexoEngine(String path) {
         if (!path.endsWith(".json"))

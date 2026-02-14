@@ -1,108 +1,153 @@
 {
   "env": {
-    "basePackage": "{{BASE_PACKAGE}}",
-    "useLombok": true,
+    "useLombok": false,
     "generateMappers": true,
     "dtoSuffix": "DTO",
     "javaVersion": 17
   },
   "entities": [
     {
-      "name": "{{ENTITY_NAME}}",
-      "tableName": "{{OPTIONAL_TABLE_NAME}}",
+      "name": "User",
+      "tableName": "users",
       "fields": [
         {
-          "name": "{{FIELD_NAME}}",
-          "type": "string",
-          "scope": ["PERSISTENCE", "DTO_IN", "DTO_OUT"],
+          "name": "username",
+          "type": "STRING",
           "persistence": {
-            "columnName": "{{OPTIONAL_DB_NAME}}",
-            "columnDefinition": "VARCHAR(255) DEFAULT 'N/A'",
-            "nullable": true,
-            "unique": false,
-            "length": 255,
-            "precision": 0,
-            "scale": 0,
-            "insertable": true,
-            "updatable": true
+            "columnName": "username",
+            "nullable": false,
+            "unique": true,
+            "length": 100
           },
           "validation": {
             "notNull": true,
-            "notEmpty": false,
-            "size": { "min": 2, "max": 100 },
-            "pattern": "^[A-Z]*$",
-            "email": false,
+            "notEmpty": true,
+            "size": { "min": 3, "max": 50 }
+          }
+        },
+        {
+          "name": "email",
+          "type": "STRING",
+          "persistence": {
+            "columnName": "email",
+            "nullable": false,
+            "unique": true,
+            "length": 255
+          },
+          "validation": {
+            "notNull": true,
+            "email": true
+          }
+        },
+        {
+          "name": "age",
+          "type": "INTEGER",
+          "persistence": {
+            "columnName": "age",
+            "nullable": true
+          },
+          "validation": {
             "min": 0,
-            "max": 1000
+            "max": 150
+          }
+        },
+        {
+          "name": "createdAt",
+          "type": "LOCAL_DATE_TIME",
+          "persistence": {
+            "columnName": "created_at",
+            "nullable": false,
+            "updatable": false
           }
         }
       ],
       "indexes": [
         {
-          "columnList": ["{{FIELD_1}}", "{{FIELD_2}}"],
-          "unique": false
+          "columnList": ["email"],
+          "unique": true
+        },
+        {
+          "columnList": ["email"]
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "tableName": "orders",
+      "fields": [
+        {
+          "name": "orderNumber",
+          "type": "STRING",
+          "persistence": {
+            "columnName": "order_number",
+            "nullable": false,
+            "unique": true,
+            "length": 50
+          },
+          "validation": {
+            "notNull": true,
+            "notEmpty": true
+          }
+        },
+        {
+          "name": "totalAmount",
+          "type": "DECIMAL",
+          "persistence": {
+            "columnName": "total_amount",
+            "nullable": false,
+            "precision": 10,
+            "scale": 2
+          },
+          "validation": {
+            "notNull": true,
+            "min": 0
+          }
+        },
+        {
+          "name": "status",
+          "type": "STRING",
+          "persistence": {
+            "columnName": "status",
+            "nullable": false,
+            "length": 20
+          }
         }
       ]
     }
   ],
   "relations": [
     {
-      "type": "MANY_TO_ONE",
-      "bidirectional": true,
-      "from": {
-        "entity": "{{CHILD_ENTITY}}",
-        "name": "{{PARENT_REFERENCE_FIELD}}",
-        "cascade": ["PERSIST", "MERGE"]
-      },
-      "to": {
-        "entity": "{{PARENT_ENTITY}}",
-        "name": "{{CHILD_COLLECTION_FIELD}}"
-      }
-    },
-    {
       "type": "ONE_TO_MANY",
       "bidirectional": true,
       "from": {
-        "entity": "{{PARENT_ENTITY}}",
-        "name": "{{CHILD_COLLECTION_FIELD}}",
-        "cascade": ["ALL"],
+        "entity": "User",
+        "name": "orders",
+        "cascade": ["PERSIST", "MERGE"],
         "orphanRemoval": true
       },
       "to": {
-        "entity": "{{CHILD_ENTITY}}",
-        "name": "{{PARENT_REFERENCE_FIELD}}"
+        "entity": "Order",
+        "name": "user"
       }
     },
     {
-      "type": "ONE_TO_ONE",
+      "type": "MANY_TO_ONE",
       "bidirectional": true,
       "from": {
-        "entity": "{{ENTITY_A}}",
-        "name": "{{REFERENCE_TO_B}}"
+        "entity": "Order",
+        "name": "user",
+        "cascade": ["PERSIST", "MERGE"]
       },
       "to": {
-        "entity": "{{ENTITY_B}}",
-        "name": "{{REFERENCE_TO_A}}"
+        "entity": "User",
+        "name": "orders"
       }
-    },
-    {
-      "type": "MANY_TO_MANY",
-      "bidirectional": true,
-      "from": {
-        "entity": "{{ENTITY_A}}",
-        "name": "{{COLLECTION_OF_B}}"
-      },
-      "to": {
-        "entity": "{{ENTITY_B}}",
-        "name": "{{COLLECTION_OF_A}}"
-      },
-      "table": "{{JOIN_TABLE_NAME}}"
     }
   ],
   "enums": [
     {
-      "name": "{{ENUM_NAME}}",
-      "values": ["VALUE_A", "VALUE_B"]
+      "name": "OrderStatus",
+      "values": ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"]
     }
   ]
 }

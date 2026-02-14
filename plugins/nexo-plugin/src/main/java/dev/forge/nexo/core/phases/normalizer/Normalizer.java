@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import dev.forge.engine.config.ForgeConfigLoader;
 import dev.forge.engine.core.ForgeEngine;
+import dev.forge.engine.utils.ProjectUtils;
 import dev.forge.engine.utils.StringUtils;
 import dev.forge.nexo.core.DataBox;
 import dev.forge.nexo.core.NexoContext;
@@ -15,6 +16,7 @@ import dev.forge.nexo.core.phases.parser.mapping.EnvConfig;
 import dev.forge.nexo.core.phases.parser.mapping.FieldDefinition;
 import dev.forge.nexo.core.phases.parser.mapping.FieldScope;
 import dev.forge.nexo.core.phases.parser.mapping.FieldType;
+import dev.forge.nexo.core.phases.parser.mapping.IndexDefinition;
 import dev.forge.nexo.core.phases.parser.mapping.PersistenceConfig;
 import dev.forge.nexo.core.phases.parser.mapping.RelationDefinition;
 import dev.forge.nexo.core.phases.parser.mapping.RelationSide;
@@ -40,17 +42,19 @@ public class Normalizer implements Runnable {
     }
 
     private EnvConfig normalizeEnv(EnvConfig env) {
+        String defaultPkg = ProjectUtils.getRootPackage() + ".generated";
         if (env == null)
-            return new EnvConfig(configurer.getString("defaults.targetPackage"),
+            return new EnvConfig(defaultPkg,
                     configurer.getBoolean("defaults.useLombok", true),
                     configurer.getBoolean("defaults.generateMappers", true),
                     configurer.getString("defaults.dtoSuffix", "DTO"),
                     configurer.getInt("defaults.javaVersion", 17));
 
         return new EnvConfig(
-                Objects.requireNonNullElse(env.basePackage(), configurer.getString("defaults.targetPackage")),
-                Objects.requireNonNullElse(env.useLombok(), true),
-                Objects.requireNonNullElse(env.generateMappers(), true),
+                Objects.requireNonNullElse(env.basePackage(), defaultPkg),
+                Objects.requireNonNullElse(env.useLombok(), configurer.getBoolean("defaults.useLombok", true)),
+                Objects.requireNonNullElse(env.generateMappers(),
+                        configurer.getBoolean("defaults.generateMappers", true)),
                 Objects.requireNonNullElse(env.dtoSuffix(), configurer.getString("defaults.dtoSuffix", "DTO")),
                 Objects.requireNonNullElse(env.javaVersion(), configurer.getInt("defaults.javaVersion", 17)));
     }
@@ -63,12 +67,26 @@ public class Normalizer implements Runnable {
                 Objects.requireNonNull(entity.name(), "Entity name cannot be null"),
                 Objects.requireNonNullElse(entity.tableName(), StringUtils.camelToSnake(entity.name()) + "s"),
                 normalizeFields(entity.fields()),
-                Objects.requireNonNullElse(entity.indexes(), List.of()))).toList();
+                normalizeInexes(entity.indexes()))).toList();
+    }
+
+    private List<IndexDefinition> normalizeInexes(List<IndexDefinition> indexes) {
+        if (indexes == null)
+            return List.of();
+
+        return indexes.stream().map(i -> new IndexDefinition(
+                Objects.requireNonNullElse(i.columnList(), List.of()),
+                Objects.requireNonNullElse(i.unique(), false))
+
+        ).toList();
     }
 
     private List<FieldDefinition> normalizeFields(List<FieldDefinition> fields) {
         if (fields == null)
-            return List.of();
+            return List.of(generateIdField());
+
+        if (fields.stream().filter(f -> f.primary() != null && f.primary()).findFirst().isEmpty())
+            fields.addFirst(generateIdField());
 
         return fields.stream().map(f -> {
             FieldType resolvedType = Objects.requireNonNullElse(f.type(), FieldType.STRING);
@@ -77,10 +95,21 @@ public class Normalizer implements Runnable {
             return new FieldDefinition(
                     Objects.requireNonNull(f.name(), "Field name cannot be null"),
                     resolvedType,
+                    Objects.requireNonNullElse(f.primary(), false),
                     Objects.requireNonNullElse(f.scope(), List.of(FieldScope.values())),
                     p,
                     normalizeValidation(f.validation(), p));
         }).toList();
+    }
+
+    private FieldDefinition generateIdField() {
+        return new FieldDefinition(
+                "id",
+                FieldType.LONG,
+                true,
+                List.of(FieldScope.values()),
+                null,
+                null);
     }
 
     private PersistenceConfig normalizePersistence(FieldDefinition f, FieldType type) {
@@ -107,7 +136,7 @@ public class Normalizer implements Runnable {
                 resolvedColDef,
                 Objects.requireNonNullElse(p.nullable(), true),
                 Objects.requireNonNullElse(p.unique(), false),
-                Objects.requireNonNullElse(p.length(), getDefaultLength(type)),
+                p.length() == null ? getDefaultLength(type) : p.length(),
                 Objects.requireNonNullElse(p.precision(), 0),
                 Objects.requireNonNullElse(p.scale(), 0),
                 Objects.requireNonNullElse(p.insertable(), true),
@@ -123,7 +152,7 @@ public class Normalizer implements Runnable {
             return new ValidationConfig(!p.nullable(), null, null, null, null, null, null);
 
         return new ValidationConfig(
-                !p.nullable() || v.notNull(),
+                !p.nullable() || Objects.requireNonNullElse(v.notNull(), false),
                 v.notEmpty(),
                 v.size(),
                 v.pattern(),
