@@ -29,7 +29,8 @@ public class AnnotationRepo {
                 new AnnotationParam("name", new StringValue(name))));
     }
 
-    public static AnnotationModel table(String name, List<AnnotationValue> indexes, List<AnnotationValue> uniqueConstraints) {
+    public static AnnotationModel table(String name, List<AnnotationValue> indexes,
+            List<AnnotationValue> uniqueConstraints) {
         var params = new ArrayList<AnnotationParam>();
         params.add(new AnnotationParam("name", new StringValue(name)));
 
@@ -221,6 +222,11 @@ public class AnnotationRepo {
 
         return new AnnotationModel("Cascade", List.of(
                 new AnnotationParam("value", new ArrayValue(values))));
+    }
+
+    public static AnnotationModel orphanRemoval() {
+        return new AnnotationModel("OrphanRemoval", List.of(
+                new AnnotationParam("value", new BooleanValue(true))));
     }
 
     public static AnnotationModel fetch(int value) {

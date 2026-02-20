@@ -9,7 +9,7 @@ public enum RegistryKey {
     Parsed_Root,
 
     /* Model objects for template rendering */
-    Entity_Models,
+    Models,
 
     /* Template rendered outputs */
     Template_Outputs

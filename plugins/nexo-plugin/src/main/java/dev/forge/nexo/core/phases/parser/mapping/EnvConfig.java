@@ -5,5 +5,8 @@ public record EnvConfig(
                 Boolean useLombok,
                 Boolean generateMappers,
                 String dtoSuffix,
-                Integer javaVersion) {
+                Integer javaVersion,
+                String relationCollection
+
+) {
 }

@@ -1,5 +1,6 @@
 package dev.forge.nexo.core.phases.normalizer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,7 +49,8 @@ public class Normalizer implements Runnable {
                     configurer.getBoolean("defaults.useLombok", true),
                     configurer.getBoolean("defaults.generateMappers", true),
                     configurer.getString("defaults.dtoSuffix", "DTO"),
-                    configurer.getInt("defaults.javaVersion", 17));
+                    configurer.getInt("defaults.javaVersion", 17),
+                    configurer.getString("defaults.relationCollection", "Set"));
 
         return new EnvConfig(
                 Objects.requireNonNullElse(env.basePackage(), defaultPkg),
@@ -56,12 +58,14 @@ public class Normalizer implements Runnable {
                 Objects.requireNonNullElse(env.generateMappers(),
                         configurer.getBoolean("defaults.generateMappers", true)),
                 Objects.requireNonNullElse(env.dtoSuffix(), configurer.getString("defaults.dtoSuffix", "DTO")),
-                Objects.requireNonNullElse(env.javaVersion(), configurer.getInt("defaults.javaVersion", 17)));
+                Objects.requireNonNullElse(env.javaVersion(), configurer.getInt("defaults.javaVersion", 17)),
+                Objects.requireNonNullElse(env.relationCollection(),
+                        configurer.getString("defaults.relationCollection", "Set")));
     }
 
     private List<EntityDefinition> normalizeEntities(List<EntityDefinition> entities) {
         if (entities == null)
-            return List.of();
+            return new ArrayList<>();
 
         return entities.stream().map(entity -> new EntityDefinition(
                 Objects.requireNonNull(entity.name(), "Entity name cannot be null"),
@@ -72,10 +76,10 @@ public class Normalizer implements Runnable {
 
     private List<IndexDefinition> normalizeInexes(List<IndexDefinition> indexes) {
         if (indexes == null)
-            return List.of();
+            return new ArrayList<>();
 
         return indexes.stream().map(i -> new IndexDefinition(
-                Objects.requireNonNullElse(i.columnList(), List.of()),
+                Objects.requireNonNullElse(i.columnList(), new ArrayList<>()),
                 Objects.requireNonNullElse(i.unique(), false))
 
         ).toList();
@@ -83,7 +87,7 @@ public class Normalizer implements Runnable {
 
     private List<FieldDefinition> normalizeFields(List<FieldDefinition> fields) {
         if (fields == null)
-            return List.of(generateIdField());
+            return new ArrayList<>(List.of(generateIdField()));
 
         if (fields.stream().filter(f -> f.primary() != null && f.primary()).findFirst().isEmpty())
             fields.addFirst(generateIdField());
@@ -96,7 +100,7 @@ public class Normalizer implements Runnable {
                     Objects.requireNonNull(f.name(), "Field name cannot be null"),
                     resolvedType,
                     Objects.requireNonNullElse(f.primary(), false),
-                    Objects.requireNonNullElse(f.scope(), List.of(FieldScope.values())),
+                    Objects.requireNonNullElse(f.scope(), new ArrayList<>(List.of(FieldScope.values()))),
                     p,
                     normalizeValidation(f.validation(), p));
         }).toList();
@@ -107,7 +111,7 @@ public class Normalizer implements Runnable {
                 "id",
                 FieldType.LONG,
                 true,
-                List.of(FieldScope.values()),
+                new ArrayList<>(List.of(FieldScope.values())),
                 null,
                 null);
     }
@@ -163,7 +167,7 @@ public class Normalizer implements Runnable {
 
     private List<RelationDefinition> normalizeRelations(List<RelationDefinition> relations) {
         if (relations == null)
-            return List.of();
+            return new ArrayList<>();
 
         return relations.stream().map(r -> new RelationDefinition(
                 Objects.requireNonNull(r.type(), "the type of relation is requeired"),
@@ -199,17 +203,17 @@ public class Normalizer implements Runnable {
                 Objects.requireNonNull(s.entity(), "entity can not be null in the sides of the relation"),
                 Objects.requireNonNull(s.name(), defaultName),
                 Objects.requireNonNullElse(s.orphanRemoval(), false),
-                Objects.requireNonNullElse(s.cascade(), List.of()));
+                Objects.requireNonNullElse(s.cascade(), new ArrayList<>()));
     }
 
     private List<EnumDefinition> normalizeEnums(List<EnumDefinition> enums) {
         if (enums == null)
-            return List.of();
+            return new ArrayList<>();
 
         return enums.stream()
                 .map(e -> new EnumDefinition(
                         Objects.requireNonNull(e.name(), "enum name is required"),
-                        Objects.requireNonNullElse(e.values(), List.of())))
+                        Objects.requireNonNullElse(e.values(), new ArrayList<>())))
                 .toList();
     }
 }

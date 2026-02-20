@@ -17,7 +17,7 @@ public class AddToStringAndEqualsAndHashCode implements ChainElement {
 
         if (primaryField != null) {
             model.addMethod(MethodsRepo.toString(entity.name(), primaryField.getName()));
-            model.addMethod(MethodsRepo.hashCode(primaryField.getType()));
+            model.addMethod(MethodsRepo.entityHashCode());
             model.addMethod(MethodsRepo.equals(entity.name(), primaryField));
         }
     }

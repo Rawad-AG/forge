@@ -12,16 +12,21 @@ import lombok.Setter;
 @Setter
 public class FieldModel {
     private String name;
-    private String type;
+    private JavaTypeModel type;
     private AccessModifier accessModifier = AccessModifier.DEFAULT;
     private List<AnnotationModel> annotations = new ArrayList<>();
     private boolean isStatic;
     private boolean isFinal;
     private String initialization;
 
-    public FieldModel(String name, String type) {
+    public FieldModel(String name, JavaTypeModel type) {
         this.name = name;
         this.type = type;
+    }
+
+    public FieldModel(String name, String type) {
+        this.name = name;
+        this.type = new JavaTypeModel(type, null);
     }
 
     public void addAnnotation(AnnotationModel annotation) {
@@ -29,7 +34,7 @@ public class FieldModel {
     }
 
     public String getGetterName() {
-        if (type.equals("boolean")) {
+        if (type.type().equals("boolean")) {
             return "is" + StringUtils.capitalize(name);
         }
         return "get" + StringUtils.capitalize(name);
@@ -54,7 +59,7 @@ public class FieldModel {
             segmants.add("static");
         if (isFinal)
             segmants.add("final");
-        segmants.add(type);
+        segmants.add(type.toString());
         segmants.add(name);
 
         if (initialization != null && !initialization.isBlank()) {

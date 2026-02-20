@@ -17,6 +17,6 @@ public class Modeler implements Runnable {
         entityModelBuilder.build();
 
         List<JavaFileModel> models = entityModelBuilder.getModels();
-        NexoContext.put(RegistryKey.Entity_Models, new DataBox(models));
+        NexoContext.put(RegistryKey.Models, new DataBox(models));
     }
 }

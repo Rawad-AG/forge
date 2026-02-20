@@ -3,6 +3,8 @@ package dev.forge.nexo.core;
 import java.nio.file.Path;
 import java.util.List;
 
+import dev.forge.nexo.core.phases.formatter.Formatter;
+import dev.forge.nexo.core.phases.importer.Importer;
 import dev.forge.nexo.core.phases.modeler.Modeler;
 import dev.forge.nexo.core.phases.normalizer.Normalizer;
 import dev.forge.nexo.core.phases.outputer.Outputer;
@@ -17,7 +19,9 @@ public class NexoEngine {
             new Normalizer(),
             new Validator(),
             new Modeler(),
+            new Importer(),
             new Templater(),
+            new Formatter(),
             new Outputer());
 
     public NexoEngine(String path) {

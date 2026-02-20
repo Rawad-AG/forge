@@ -26,9 +26,7 @@ public class EntityModelBuilder implements ModelBuilder {
             new AddEntityAnn(),
             new AddFields(),
             new AddGetterSetter(),
-            new AddToStringAndEqualsAndHashCode()
-
-    );
+            new AddToStringAndEqualsAndHashCode());
 
     @Override
     public void build() {
@@ -45,6 +43,8 @@ public class EntityModelBuilder implements ModelBuilder {
             chain.forEach(c -> c.execute(model, entity));
             entities.add(model);
         }
+
+        RelationHandler.handle(entities.stream().map(ClassModel.class::cast).toList());
     }
 
     @Override

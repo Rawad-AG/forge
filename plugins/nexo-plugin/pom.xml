@@ -51,10 +51,17 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!-- FreeMarker - Template engine with logic support -->
+        <!-- Mustache -->
         <dependency>
-            <groupId>org.freemarker</groupId>
-            <artifactId>freemarker</artifactId>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.eclipse.jdt</groupId>
+            <artifactId>org.eclipse.jdt.core</artifactId>
+            <version>3.38.0</version>
         </dependency>
 
 

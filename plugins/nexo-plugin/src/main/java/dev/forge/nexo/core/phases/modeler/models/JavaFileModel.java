@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.forge.nexo.core.phases.modeler.models.annotation.AnnotationModel;
+import dev.forge.nexo.utils.ImportsRepo;
 import lombok.Data;
 
 @Data
@@ -17,6 +18,8 @@ public abstract class JavaFileModel {
     public JavaFileModel(String pkg, String name) {
         this.pkg = pkg;
         this.name = name;
+
+        ImportsRepo.register(name, pkg + "." + name);
     }
 
     public void addAnnotation(AnnotationModel ann) {

@@ -1,23 +1,14 @@
 package dev.forge.nexo.utils;
 
-import java.util.List;
-
 import dev.forge.engine.utils.StringUtils;
 import dev.forge.nexo.core.phases.modeler.models.field.AccessModifier;
 import dev.forge.nexo.core.phases.modeler.models.field.FieldModel;
-import dev.forge.nexo.core.phases.modeler.models.method.ConstructorModel;
+import dev.forge.nexo.core.phases.modeler.models.field.JavaTypeModel;
 import dev.forge.nexo.core.phases.modeler.models.method.MethodBody;
 import dev.forge.nexo.core.phases.modeler.models.method.MethodModel;
 import dev.forge.nexo.core.phases.modeler.models.method.ParameterModel;
 
 public class MethodsRepo {
-
-    public static MethodModel override(String name, String returnType) {
-        var method = new MethodModel(name, returnType);
-        method.addAnnotation(AnnotationRepo.override());
-        method.setAccessModifier(AccessModifier.PUBLIC);
-        return method;
-    }
 
     public static MethodModel toString(MethodBody body) {
         var method = new MethodModel("toString", "String");
@@ -41,9 +32,9 @@ public class MethodsRepo {
         return method;
     }
 
-    public static MethodModel hashCode(String type) {
+    public static MethodModel entityHashCode() {
         var body = new MethodBody();
-        body.addStatement("return " + type + ".class.hashCode()");
+        body.addStatement("return getClass().hashCode()");
         return hashCode(body);
     }
 
@@ -56,9 +47,12 @@ public class MethodsRepo {
         return method;
     }
 
-    public static MethodModel getter(String fieldName, String fieldType) {
+    public static MethodModel getter(String fieldName, JavaTypeModel fieldType) {
+        if ("boolean".equals(fieldType.type()) || "Boolean".equals(fieldType.type()))
+            return booleanGetter(fieldName);
+
         String methodName = "get" + StringUtils.capitalize(fieldName);
-        var method = new MethodModel(methodName, fieldType);
+        var method = new MethodModel(methodName, fieldType.toString());
         method.setAccessModifier(AccessModifier.PUBLIC);
         var body = new MethodBody();
         body.addStatement("return " + fieldName);
@@ -76,82 +70,13 @@ public class MethodsRepo {
         return method;
     }
 
-    public static MethodModel setter(String fieldName, String fieldType) {
+    public static MethodModel setter(String fieldName, JavaTypeModel fieldType) {
         String methodName = "set" + StringUtils.capitalize(fieldName);
         var method = new MethodModel(methodName, "void");
         method.setAccessModifier(AccessModifier.PUBLIC);
-        method.addParameter(new ParameterModel(fieldName, fieldType));
+        method.addParameter(new ParameterModel(fieldName, fieldType.toString()));
         var body = new MethodBody();
         body.addStatement("this." + fieldName + " = " + fieldName);
-        method.setBody(body);
-        return method;
-    }
-
-    public static MethodModel constructor(List<ParameterModel> parameters, MethodBody body) {
-        var constructor = new ConstructorModel("constructor");
-        constructor.setAccessModifier(AccessModifier.PUBLIC);
-        for (var param : parameters) {
-            constructor.addParameter(param);
-        }
-        constructor.setBody(body);
-        return constructor;
-    }
-
-    public static MethodModel staticMethod(String name, String returnType, MethodBody body) {
-        var method = new MethodModel(name, returnType);
-        method.setAccessModifier(AccessModifier.PUBLIC);
-        method.setStatic(true);
-        method.setBody(body);
-        return method;
-    }
-
-    public static MethodModel abstractMethod(String name, String returnType) {
-        var method = new MethodModel(name, returnType);
-        method.setAccessModifier(AccessModifier.PUBLIC);
-        return method;
-    }
-
-    public static MethodModel privateMethod(String name, String returnType, MethodBody body) {
-        var method = new MethodModel(name, returnType);
-        method.setAccessModifier(AccessModifier.PRIVATE);
-        method.setBody(body);
-        return method;
-    }
-
-    public static MethodModel protectedMethod(String name, String returnType, MethodBody body) {
-        var method = new MethodModel(name, returnType);
-        method.setAccessModifier(AccessModifier.PROTECTED);
-        method.setBody(body);
-        return method;
-    }
-
-    public static MethodModel builderMethod(String builderClassName) {
-        var method = new MethodModel("builder", builderClassName);
-        method.setAccessModifier(AccessModifier.PUBLIC);
-        method.setStatic(true);
-        var body = new MethodBody();
-        body.addStatement("return new " + builderClassName + "()");
-        method.setBody(body);
-        return method;
-    }
-
-    public static MethodModel builderSetter(String fieldName, String fieldType) {
-        String methodName = StringUtils.capitalize(fieldName);
-        var method = new MethodModel(methodName, "Builder");
-        method.setAccessModifier(AccessModifier.PUBLIC);
-        method.addParameter(new ParameterModel(fieldName, fieldType));
-        var body = new MethodBody();
-        body.addStatement("this." + fieldName + " = " + fieldName);
-        body.addStatement("return this");
-        method.setBody(body);
-        return method;
-    }
-
-    public static MethodModel builderBuild(String returnType) {
-        var method = new MethodModel("build", returnType);
-        method.setAccessModifier(AccessModifier.PUBLIC);
-        var body = new MethodBody();
-        body.addStatement("return new " + returnType + "(this)");
         method.setBody(body);
         return method;
     }
@@ -165,14 +90,16 @@ public class MethodsRepo {
 
     public static MethodModel equals(String type, FieldModel targetField) {
         var body = new MethodBody();
+
         body.addStatement("if (this == obj) return true");
-
-        body.addStatement("if (!(obj instanceof " + type + ")) return false");
-
-        body.addStatement(type + " other = (" + type + ") obj");
-
-        body.addStatement("var otherId = " + "other." + targetField.getGetterName() + "()");
-        body.addStatement("return otherId != null && this." + targetField.getName() + ".equals(otherId)");
+        body.addStatement("if (!(obj instanceof " + type + " other)) return false");
+        body.addStatement("return "
+                + targetField.getName()
+                + " != null && "
+                + targetField.getName()
+                + ".equals(other."
+                + targetField.getName()
+                + ")");
 
         return equals(body);
     }

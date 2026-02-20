@@ -1,5 +1,6 @@
 package dev.forge.nexo.core.phases.modeler.models.annotation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
@@ -11,12 +12,12 @@ public class AnnotationModel {
 
     public AnnotationModel(String name) {
         this.name = name;
-        this.params = List.of();
+        this.params = new ArrayList<>();
     }
 
     public AnnotationModel(String name, List<AnnotationParam> params) {
         this.name = name;
-        this.params = params != null ? params : List.of();
+        this.params = params != null ? new ArrayList<>(params) : new ArrayList<>();
     }
 
     public boolean hasParams() {

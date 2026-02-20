@@ -1,0 +1,27 @@
+package {{model.pkg}};
+
+{{#model.imports}}
+import {{.}};
+{{/model.imports}}
+
+{{#model.annotations}}
+{{{.}}}
+{{/model.annotations}}
+public class {{model.name}} {
+
+    {{#model.fields}}
+    {{#annotations}}
+    {{{.}}}
+    {{/annotations}}
+    {{{.}}};
+
+    {{/model.fields}}
+
+    {{#model.methods}}
+    {{#annotations}}
+    {{{.}}}
+    {{/annotations}}
+    {{{.}}}
+
+    {{/model.methods}}
+}
