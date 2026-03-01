@@ -22,7 +22,7 @@
         <dependency>
             <groupId>dev.forge</groupId>
             <artifactId>forge-engine</artifactId>
-            <version>${engine.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Picocli -->

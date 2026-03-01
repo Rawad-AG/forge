@@ -179,13 +179,17 @@ public class AnnotationRepo {
     }
 
     public static AnnotationModel oneToOne(String mappedBy) {
-        return new AnnotationModel("OneToOne", List.of(
-                new AnnotationParam("mappedBy", new StringValue(mappedBy))));
+        List<AnnotationParam> params = mappedBy == null ? List.of()
+                : List.of(
+                        new AnnotationParam("mappedBy", new StringValue(mappedBy)));
+        return new AnnotationModel("OneToOne", params);
     }
 
     public static AnnotationModel oneToMany(String mappedBy) {
-        return new AnnotationModel("OneToMany", List.of(
-                new AnnotationParam("mappedBy", new StringValue(mappedBy))));
+        List<AnnotationParam> params = mappedBy == null ? List.of()
+                : List.of(
+                        new AnnotationParam("mappedBy", new StringValue(mappedBy)));
+        return new AnnotationModel("OneToMany", params);
     }
 
     public static AnnotationModel manyToOne() {
@@ -193,8 +197,10 @@ public class AnnotationRepo {
     }
 
     public static AnnotationModel manyToMany(String mappedBy) {
-        return new AnnotationModel("ManyToMany", List.of(
-                new AnnotationParam("mappedBy", new StringValue(mappedBy))));
+        List<AnnotationParam> params = mappedBy == null ? List.of()
+                : List.of(
+                        new AnnotationParam("mappedBy", new StringValue(mappedBy)));
+        return new AnnotationModel("ManyToMany", params);
     }
 
     public static AnnotationModel joinTable(String name, String joinColumns, String inverseJoinColumns) {

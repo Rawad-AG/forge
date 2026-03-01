@@ -24,7 +24,6 @@ import dev.forge.nexo.core.phases.parser.mapping.RelationSide;
 import dev.forge.nexo.core.phases.parser.mapping.Root;
 import dev.forge.nexo.core.phases.parser.mapping.ValidationConfig;
 import dev.forge.nexo.utils.RelationshipType;
-import lombok.NonNull;
 
 public class Normalizer implements Runnable {
     private final ForgeConfigLoader configurer = ForgeEngine.context().config();
@@ -99,10 +98,12 @@ public class Normalizer implements Runnable {
             return new FieldDefinition(
                     Objects.requireNonNull(f.name(), "Field name cannot be null"),
                     resolvedType,
+                    f.ref(),
                     Objects.requireNonNullElse(f.primary(), false),
                     Objects.requireNonNullElse(f.scope(), new ArrayList<>(List.of(FieldScope.values()))),
                     p,
-                    normalizeValidation(f.validation(), p));
+                    normalizeValidation(f.validation(), p),
+                    f.defaultValue());
         }).toList();
     }
 
@@ -110,8 +111,10 @@ public class Normalizer implements Runnable {
         return new FieldDefinition(
                 "id",
                 FieldType.LONG,
+                null,
                 true,
                 new ArrayList<>(List.of(FieldScope.values())),
+                null,
                 null,
                 null);
     }
@@ -169,39 +172,81 @@ public class Normalizer implements Runnable {
         if (relations == null)
             return new ArrayList<>();
 
-        return relations.stream().map(r -> new RelationDefinition(
-                Objects.requireNonNull(r.type(), "the type of relation is requeired"),
+        var normalizedRelations = new ArrayList<>(relations.stream().map(r -> new RelationDefinition(
+                Objects.requireNonNull(r.type(), "the type of relation is required"),
                 Objects.requireNonNullElse(r.bidirectional(), false),
-                normalizeRelationSide(r, r.from()),
-                normalizeRelationSide(r, r.to()),
+                normalizeRelationSide(r, "from"),
+                normalizeRelationSide(r, "to"),
                 normalizeJoinTable(r)))
-                .toList();
+                .toList());
+
+        var additions = new ArrayList<RelationDefinition>();
+
+        for (var nr : normalizedRelations) {
+            if (nr.bidirectional()) {
+                var reversed = normalizedRelations.stream()
+                        .filter(r -> nr.type().inverseOf(r.type())
+                                && nr.from().entity().equals(r.to().entity())
+                                && nr.to().entity().equals(r.from().entity()))
+                        .findAny();
+
+                if (reversed.isEmpty()) {
+                    var inversed = new RelationDefinition(
+                            nr.type().getInverse(),
+                            !nr.bidirectional(),
+                            new RelationSide(nr.to().entity(), nr.to().name(), nr.to().orphanRemoval(),
+                                    nr.to().cascade()),
+                            new RelationSide(nr.from().entity(), nr.from().name(), nr.from().orphanRemoval(),
+                                    nr.from().cascade()),
+                            null);
+
+                    additions.add(new RelationDefinition(
+                            inversed.type(),
+                            inversed.bidirectional(),
+                            normalizeRelationSide(inversed, "from"),
+                            normalizeRelationSide(inversed, "to"),
+                            nr.table() == null ? normalizeJoinTable(inversed) : null));
+                }
+            }
+        }
+
+        normalizedRelations.addAll(additions);
+
+        return normalizedRelations;
     }
 
     private String normalizeJoinTable(RelationDefinition r) {
-        if (r.table() == null && r.type() == RelationshipType.MANY_TO_MANY) {
-            String from = r.from().entity().endsWith("s")
-                    ? r.from().entity()
-                    : r.from().entity() + "s";
+        if (Boolean.TRUE.equals(r.bidirectional()))
+            return r.table();
 
-            String to = r.to().entity().endsWith("s")
-                    ? r.to().entity()
-                    : r.to().entity() + "s";
+        if (r.table() != null)
+            return r.table();
 
-            return from + "_" + to;
-        }
-        return r.table();
+        if (r.type() != RelationshipType.MANY_TO_MANY)
+            return r.table();
+
+        String from = r.from().entity().endsWith("s")
+                ? r.from().entity()
+                : r.from().entity() + "s";
+
+        String to = r.to().entity().endsWith("s")
+                ? r.to().entity()
+                : r.to().entity() + "s";
+
+        return from + "_" + to;
+
     }
 
-    private RelationSide normalizeRelationSide(RelationDefinition r, @NonNull RelationSide s) {
-        String entityName = s.entity().substring(0, 1).toLowerCase() + s.entity().substring(1);
+    private RelationSide normalizeRelationSide(RelationDefinition r, String side) {
+        var s = "from".equals(side) ? r.from() : r.to();
+        String fieldName = StringUtils.lowerize("from".equals(side) ? r.to().entity() : r.from().entity());
         String defaultName = r.type() == RelationshipType.MANY_TO_MANY
-                ? entityName + "s"
-                : entityName;
+                ? fieldName + "s"
+                : fieldName;
 
         return new RelationSide(
                 Objects.requireNonNull(s.entity(), "entity can not be null in the sides of the relation"),
-                Objects.requireNonNull(s.name(), defaultName),
+                Objects.requireNonNullElse(s.name(), defaultName),
                 Objects.requireNonNullElse(s.orphanRemoval(), false),
                 Objects.requireNonNullElse(s.cascade(), new ArrayList<>()));
     }

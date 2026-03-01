@@ -5,6 +5,9 @@ public class StringUtils {
         return (s.charAt(0) + "").toUpperCase() + s.substring(1);
     }
 
+    public static String lowerize(String s) {
+        return (s.charAt(0) + "").toLowerCase() + s.substring(1);
+    }
 
     public static String camelToSnake(String str) {
         if (str == null)

@@ -42,7 +42,7 @@ public class MethodsRepo {
         var method = new MethodModel("equals", "boolean");
         method.addAnnotation(AnnotationRepo.override());
         method.setAccessModifier(AccessModifier.PUBLIC);
-        method.addParameter(new ParameterModel("obj", "Object"));
+        method.addParameter(new ParameterModel("obj", new JavaTypeModel("Object", null)));
         method.setBody(body);
         return method;
     }
@@ -74,7 +74,7 @@ public class MethodsRepo {
         String methodName = "set" + StringUtils.capitalize(fieldName);
         var method = new MethodModel(methodName, "void");
         method.setAccessModifier(AccessModifier.PUBLIC);
-        method.addParameter(new ParameterModel(fieldName, fieldType.toString()));
+        method.addParameter(new ParameterModel(fieldName, fieldType));
         var body = new MethodBody();
         body.addStatement("this." + fieldName + " = " + fieldName);
         method.setBody(body);

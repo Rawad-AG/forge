@@ -51,6 +51,10 @@ public class FieldModel {
                 .isPresent();
     }
 
+    public boolean isCollection() {
+        return "set".equalsIgnoreCase(type.generic()) || "list".equalsIgnoreCase(type.generic());
+    }
+
     @Override
     public String toString() {
         List<String> segmants = new ArrayList<>();

@@ -1,4 +1,4 @@
-package dev.forge.nexo.core.phases.modeler.entity;
+package dev.forge.nexo.core.phases.modeler;
 
 import dev.forge.nexo.core.phases.modeler.models.ClassModel;
 import dev.forge.nexo.core.phases.parser.mapping.EntityDefinition;

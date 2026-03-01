@@ -20,9 +20,9 @@ public class JoinTableRule implements Rule {
                 errors.add("Join table can only be specified for MANY_TO_MANY relationships. "
                         + "Found in '" + rel.from().entity() + " -> " + rel.to().entity() + "' (" + rel.type() + ").");
 
-            if (!hasJoinTable && rel.type() == RelationshipType.MANY_TO_MANY)
+            if (hasJoinTable && rel.bidirectional())
                 errors.add("MANY_TO_MANY relationship '" + rel.from().entity() + " -> " + rel.to().entity()
-                        + "' requires a join table name.");
+                        + "' is the owning side can not be biderectional.");
         }
 
         return errors;

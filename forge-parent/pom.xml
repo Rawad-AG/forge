@@ -129,7 +129,6 @@
                     </configuration>
                 </plugin>
 
-                <!-- Shade plugin for fat jar -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
@@ -142,16 +141,14 @@
                                 <goal>shade</goal>
                             </goals>
                             <configuration>
+                                <shadedArtifactAttached>true</shadedArtifactAttached>
+                                <shadedClassifierName>shaded</shadedClassifierName>
                                 <createDependencyReducedPom>false</createDependencyReducedPom>
                                 <transformers>
-                                    <!-- Merge forge-plugin.properties -->
                                     <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                         <resource>META-INF/forge-plugin.properties</resource>
                                     </transformer>
-                                    <!-- Merge META-INF/services if needed -->
-                                    <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                                 </transformers>
                             </configuration>
                         </execution>

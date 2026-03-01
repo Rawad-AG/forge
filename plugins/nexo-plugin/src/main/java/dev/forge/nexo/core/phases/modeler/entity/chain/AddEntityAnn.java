@@ -1,6 +1,6 @@
 package dev.forge.nexo.core.phases.modeler.entity.chain;
 
-import dev.forge.nexo.core.phases.modeler.entity.ChainElement;
+import dev.forge.nexo.core.phases.modeler.ChainElement;
 import dev.forge.nexo.core.phases.modeler.models.ClassModel;
 import dev.forge.nexo.core.phases.parser.mapping.EntityDefinition;
 import dev.forge.nexo.utils.AnnotationRepo;

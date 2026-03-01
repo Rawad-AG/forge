@@ -1,10 +1,11 @@
 package dev.forge.nexo.core.phases.modeler.entity.chain;
 
-import dev.forge.nexo.core.phases.modeler.entity.ChainElement;
+import dev.forge.nexo.core.phases.modeler.ChainElement;
 import dev.forge.nexo.core.phases.modeler.models.ClassModel;
 import dev.forge.nexo.core.phases.modeler.models.field.AccessModifier;
 import dev.forge.nexo.core.phases.modeler.models.field.FieldModel;
 import dev.forge.nexo.core.phases.parser.mapping.EntityDefinition;
+import dev.forge.nexo.core.phases.parser.mapping.FieldType;
 import dev.forge.nexo.utils.AnnotationRepo;
 
 public class AddFields implements ChainElement {
@@ -13,7 +14,8 @@ public class AddFields implements ChainElement {
     public void execute(ClassModel model, EntityDefinition entity) {
 
         for (var f : entity.fields()) {
-            var field = new FieldModel(f.name(), f.type().getJavaType());
+            var type = f.type() == FieldType.ENUM ? f.ref() : f.type().getJavaType();
+            var field = new FieldModel(f.name(), type);
             field.setAccessModifier(AccessModifier.PRIVATE);
 
             if (f.primary())

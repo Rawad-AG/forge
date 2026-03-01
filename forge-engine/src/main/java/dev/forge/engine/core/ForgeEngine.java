@@ -36,6 +36,7 @@ public final class ForgeEngine {
             context = new ExecutionContext(ctx, config);
             plugin.execute(pluginArgs);
         } catch (Exception e) {
+            e.printStackTrace();
             console.error(e.getMessage(), e);
         } finally {
             ctx.close();

@@ -12,7 +12,7 @@ import lombok.Setter;
 public class ConstructorModel extends MethodModel {
 
     public ConstructorModel(String name) {
-        super(name, null);
+        super(name);
         this.body = new MethodBody();
     }
 

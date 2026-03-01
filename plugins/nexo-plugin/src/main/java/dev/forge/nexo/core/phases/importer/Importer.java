@@ -12,7 +12,6 @@ import dev.forge.nexo.core.phases.modeler.models.JavaFileModel;
 import dev.forge.nexo.core.phases.modeler.models.RecordModel;
 import dev.forge.nexo.core.phases.modeler.models.field.JavaTypeModel;
 import dev.forge.nexo.utils.ImportsRepo;
-import lombok.NonNull;
 
 public class Importer implements Runnable {
 
@@ -60,7 +59,10 @@ public class Importer implements Runnable {
 
     }
 
-    private void addImport(JavaFileModel model, @NonNull JavaTypeModel type) {
+    private void addImport(JavaFileModel model, JavaTypeModel type) {
+        if (type == null)
+            return;
+
         addImport(model, type.type());
         if (type.generic() != null)
             addImport(model, type.generic());

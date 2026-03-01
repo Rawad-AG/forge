@@ -14,6 +14,9 @@ import dev.forge.nexo.core.phases.modeler.models.annotation.BooleanValue;
 import dev.forge.nexo.core.phases.modeler.models.annotation.EnumValue;
 import dev.forge.nexo.core.phases.modeler.models.field.FieldModel;
 import dev.forge.nexo.core.phases.modeler.models.field.JavaTypeModel;
+import dev.forge.nexo.core.phases.modeler.models.method.MethodBody;
+import dev.forge.nexo.core.phases.modeler.models.method.MethodModel;
+import dev.forge.nexo.core.phases.modeler.models.method.ParameterModel;
 import dev.forge.nexo.core.phases.parser.mapping.RelationDefinition;
 import dev.forge.nexo.core.phases.parser.mapping.RelationSide;
 import dev.forge.nexo.core.phases.parser.mapping.Root;
@@ -38,11 +41,10 @@ public class RelationHandler {
 
     }
 
-    private static void handleRelation(RelationDefinition relation, Map<String, ClassModel> entityMap) {
-        RelationshipType type = relation.type();
-        RelationSide from = relation.from();
-        RelationSide to = relation.to();
-        boolean bidirectional = relation.bidirectional();
+    private static void handleRelation(RelationDefinition rel, Map<String, ClassModel> entityMap) {
+        RelationshipType type = rel.type();
+        RelationSide from = rel.from();
+        RelationSide to = rel.to();
 
         ClassModel sourceEntity = entityMap.get(from.entity());
         ClassModel targetEntity = entityMap.get(to.entity());
@@ -51,24 +53,25 @@ public class RelationHandler {
             return;
 
         switch (type) {
-            case ONE_TO_MANY -> handleOneToMany(relation, sourceEntity, targetEntity, bidirectional);
-            case MANY_TO_ONE -> handleManyToOne(relation, sourceEntity, targetEntity, bidirectional);
-            case ONE_TO_ONE -> handleOneToOne(relation, sourceEntity, targetEntity, bidirectional);
-            case MANY_TO_MANY -> handleManyToMany(relation, sourceEntity, targetEntity, bidirectional);
+            case ONE_TO_MANY -> handleOneToMany(rel, sourceEntity, targetEntity);
+            case MANY_TO_ONE -> handleManyToOne(rel, sourceEntity, targetEntity);
+            case ONE_TO_ONE -> handleOneToOne(rel, sourceEntity, targetEntity);
+            case MANY_TO_MANY -> handleManyToMany(rel, sourceEntity, targetEntity);
         }
+
+        addSyncSetter(sourceEntity, targetEntity, rel);
     }
 
-    private static void handleOneToMany(RelationDefinition relation, ClassModel source, ClassModel target,
-            boolean bidirectional) {
-        RelationSide from = relation.from();
-        RelationSide to = relation.to();
+    private static void handleOneToMany(RelationDefinition rel, ClassModel source, ClassModel target) {
+        RelationSide from = rel.from();
+        RelationSide to = rel.to();
 
         FieldModel field = new FieldModel(from.name(),
                 new JavaTypeModel(target.getName(), root.env().relationCollection()));
 
         initCollection(source, field, root.env().relationCollection());
 
-        if (bidirectional)
+        if (rel.bidirectional())
             field.getAnnotations().add(AnnotationRepo.oneToMany(to.name()));
         else
             field.getAnnotations().add(AnnotationRepo.oneToMany(null));
@@ -77,15 +80,10 @@ public class RelationHandler {
 
         source.addField(field);
 
-        if (bidirectional)
-            addSyncSetter(source, target, from.name(), to.name(),
-                    root.env().relationCollection() + "<" + target.getName() + ">");
     }
 
-    private static void handleManyToOne(RelationDefinition relation, ClassModel source, ClassModel target,
-            boolean bidirectional) {
-        RelationSide from = relation.from();
-        RelationSide to = relation.to();
+    private static void handleManyToOne(RelationDefinition rel, ClassModel source, ClassModel target) {
+        RelationSide from = rel.from();
 
         FieldModel field = new FieldModel(from.name(), target.getName());
         field.getAnnotations().add(AnnotationRepo.manyToOne());
@@ -93,20 +91,15 @@ public class RelationHandler {
         addCascadeAnnotation(field, from.cascade(), "ManyToOne", from.orphanRemoval());
 
         source.addField(field);
-
-        if (bidirectional)
-            addSyncSetter(source, target, from.name(), to.name(), target.getName());
-
     }
 
-    private static void handleOneToOne(RelationDefinition relation, ClassModel source, ClassModel target,
-            boolean bidirectional) {
-        RelationSide from = relation.from();
-        RelationSide to = relation.to();
+    private static void handleOneToOne(RelationDefinition rel, ClassModel source, ClassModel target) {
+        RelationSide from = rel.from();
+        RelationSide to = rel.to();
 
         FieldModel field = new FieldModel(from.name(), target.getName());
 
-        if (bidirectional)
+        if (rel.bidirectional())
             field.getAnnotations().add(AnnotationRepo.oneToOne(to.name()));
         else
             field.getAnnotations().add(AnnotationRepo.oneToOne(null));
@@ -114,40 +107,31 @@ public class RelationHandler {
         addCascadeAnnotation(field, from.cascade(), "OneToOne", from.orphanRemoval());
 
         source.addField(field);
-
-        if (bidirectional)
-            addSyncSetter(source, target, from.name(), to.name(), target.getName());
-
     }
 
-    private static void handleManyToMany(RelationDefinition relation, ClassModel source, ClassModel target,
-            boolean bidirectional) {
-        RelationSide from = relation.from();
-        RelationSide to = relation.to();
+    private static void handleManyToMany(RelationDefinition rel, ClassModel source, ClassModel target) {
+        RelationSide from = rel.from();
+        RelationSide to = rel.to();
 
         FieldModel field = new FieldModel(from.name(),
                 new JavaTypeModel(target.getName(), root.env().relationCollection()));
         initCollection(source, field, root.env().relationCollection());
 
-        if (bidirectional)
+        if (rel.bidirectional())
             field.getAnnotations().add(AnnotationRepo.manyToMany(to.name()));
         else
             field.getAnnotations().add(AnnotationRepo.manyToMany(null));
 
         addCascadeAnnotation(field, from.cascade(), "ManyToMany", from.orphanRemoval());
 
-        if (!bidirectional && relation.table() != null) {
-            String joinTable = relation.table();
+        if (rel.table() != null) {
+            String joinTable = rel.table();
             String sourceColumn = from.entity().toLowerCase() + "_id";
             String targetColumn = to.entity().toLowerCase() + "_id";
             field.getAnnotations().add(AnnotationRepo.joinTable(joinTable, sourceColumn, targetColumn));
         }
 
         source.addField(field);
-
-        if (bidirectional)
-            addSyncSetter(source, target, from.name(), to.name(), "Set<" + target.getName() + ">");
-
     }
 
     private static void addCascadeAnnotation(FieldModel field, List<CascadeType> cascadeTypes, String type,
@@ -170,16 +154,29 @@ public class RelationHandler {
                 });
     }
 
-    private static void addSyncSetter(ClassModel source, ClassModel target, String fieldName, String targetFieldName,
-            String fieldType) {
-        // TODO
-    }
-
     private static void initCollection(ClassModel source, FieldModel field, String relationCollection) {
         if (relationCollection.equalsIgnoreCase("list"))
             field.setInitialization("new ArrayList<>()");
         else
             field.setInitialization("new HashSet<>()");
+    }
+
+    private static void addSyncSetter(ClassModel source, ClassModel target, RelationDefinition rel) {
+        var sourceField = source.getFields().stream()
+                .filter(f -> f.getType().type().equals(target.getName())
+                        && f.hasAnnotation(rel.type().getAnnotationName()))
+                .findAny();
+
+        if (sourceField.isPresent()) {
+            var f = sourceField.get();
+            var method = new MethodModel(f.getSetterName());
+            method.addParameter(new ParameterModel(f.getName(), f.getType()));
+
+            var body = new MethodBody();
+            body.addStatement("this." + f.getName() + " = " + f.getName());
+            method.setBody(body);
+            source.addMethod(method);
+        }
     }
 
 }

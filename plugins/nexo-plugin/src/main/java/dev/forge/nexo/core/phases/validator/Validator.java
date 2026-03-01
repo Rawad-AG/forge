@@ -9,6 +9,7 @@ import dev.forge.nexo.core.RegistryKey;
 import dev.forge.nexo.core.phases.parser.mapping.Root;
 import dev.forge.nexo.core.phases.validator.rules.DuplicateNameRule;
 import dev.forge.nexo.core.phases.validator.rules.EntityExistenceRule;
+import dev.forge.nexo.core.phases.validator.rules.EnumExistenceRule;
 import dev.forge.nexo.core.phases.validator.rules.IndexFieldsRule;
 import dev.forge.nexo.core.phases.validator.rules.JoinTableRule;
 import dev.forge.nexo.core.phases.validator.rules.PackageNameRule;
@@ -22,6 +23,7 @@ public class Validator implements Runnable {
             new DuplicateNameRule(),
             new ReservedKeywordsRule(),
             new EntityExistenceRule(),
+            new EnumExistenceRule(),
             new IndexFieldsRule(),
             new JoinTableRule());
 

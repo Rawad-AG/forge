@@ -7,6 +7,7 @@ import dev.forge.engine.config.ForgeConfigLoader;
 import dev.forge.engine.core.ForgeEngine;
 import dev.forge.nexo.core.NexoContext;
 import dev.forge.nexo.core.RegistryKey;
+import dev.forge.nexo.core.phases.modeler.ChainElement;
 import dev.forge.nexo.core.phases.modeler.ModelBuilder;
 import dev.forge.nexo.core.phases.modeler.entity.chain.AddEntityAnn;
 import dev.forge.nexo.core.phases.modeler.entity.chain.AddFields;

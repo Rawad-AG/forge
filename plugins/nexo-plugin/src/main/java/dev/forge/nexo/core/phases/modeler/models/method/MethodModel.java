@@ -5,12 +5,13 @@ import java.util.List;
 
 import dev.forge.nexo.core.phases.modeler.models.annotation.AnnotationModel;
 import dev.forge.nexo.core.phases.modeler.models.field.AccessModifier;
+import dev.forge.nexo.core.phases.modeler.models.field.JavaTypeModel;
 import lombok.Data;
 
 @Data
 public class MethodModel {
     protected String name;
-    protected String returnType;
+    protected JavaTypeModel returnType;
     protected MethodBody body;
     protected boolean isStatic;
     protected boolean isFinal;
@@ -26,9 +27,18 @@ public class MethodModel {
         isAbstract = a;
     }
 
-    public MethodModel(String name, String returnType) {
+    public MethodModel(String name, JavaTypeModel returnType) {
         this.name = name;
         this.returnType = returnType;
+    }
+
+    public MethodModel(String name, String returnType) {
+        this.name = name;
+        this.returnType = new JavaTypeModel(returnType, null);
+    }
+
+    public MethodModel(String name) {
+        this.name = name;
     }
 
     public void addParameter(ParameterModel param) {
@@ -52,7 +62,10 @@ public class MethodModel {
         if (isAbstract)
             segmants.add("abstract");
 
-        segmants.add(returnType);
+        if (returnType == null)
+            segmants.add("void");
+        else
+            segmants.add(returnType.toString());
 
         segmants.add(name);
 
