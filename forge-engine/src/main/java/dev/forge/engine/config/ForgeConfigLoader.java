@@ -107,12 +107,9 @@ public final class ForgeConfigLoader {
     }
 
     public String getPath(String path, String def) {
-        return hasPath(path) ? getPath(conf.getString(path)) : resolvePath(def);
+        return hasPath(path) ? getPath(path) : resolvePath(def);
     }
 
-    // ╔═════════════════════════════════════════════════════════════╗
-    // ║ Internals
-    // ╚═════════════════════════════════════════════════════════════╝
     private String resolvePath(String path) {
         return path.replaceAll("~", System.getProperty("user.home"));
     }

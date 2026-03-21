@@ -30,6 +30,17 @@ public final class Console {
         println(style(Styles::info, "> " + msg));
     }
 
+    public void clear() {
+        if (useAnsi) {
+            ctx.out().print("\033[H\033[2J");
+            ctx.out().flush();
+        } else {
+            for (int i = 0; i < ctx.height(); i++) {
+                line();
+            }
+        }
+    }
+
     public void success(String msg) {
         println(style(Styles::success, "> " + msg));
     }

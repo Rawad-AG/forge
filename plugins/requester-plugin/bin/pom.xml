@@ -10,11 +10,11 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>codeforces</artifactId>
+    <artifactId>requester</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>codeforces</name>
+    <name>requester</name>
 
     <dependencies>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>dev.forge</groupId>
             <artifactId>forge-engine</artifactId>
-            <version>${engine.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- Picocli -->
@@ -44,19 +44,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Jackson for JSON -->
+        <!-- Jackson -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
-        <!-- Mustache -->
-        <dependency>
-            <groupId>com.github.spullara.mustache.java</groupId>
-            <artifactId>compiler</artifactId>
-            <version>0.9.10</version>
-        </dependency>
-
     </dependencies>
 
 

@@ -13,3 +13,8 @@ dependency-reduced-pom.xml
 *.orig
 
 
+**/.classpath
+**/.factorypath
+**/.project
+**/AGENTS.md
+**/.settings/

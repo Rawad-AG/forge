@@ -1,0 +1,58 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.StringTokenizer;
+
+public class Main {
+
+    static class FastReader {
+        BufferedReader br;
+        StringTokenizer st;
+
+        public FastReader() {
+            br = new BufferedReader(new InputStreamReader(System.in));
+        }
+
+        String next() {
+            while (st == null || !st.hasMoreElements()) {
+                try {
+                    String line = br.readLine();
+                    if (line == null)
+                        return null;
+                    st = new StringTokenizer(line);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return st.nextToken();
+        }
+
+        int nextInt() {
+            return Integer.parseInt(next());
+        }
+
+        long nextLong() {
+            return Long.parseLong(next());
+        }
+    }
+
+    public static void main(String[] args) {
+        FastReader fr = new FastReader();
+        PrintWriter out = new PrintWriter(System.out);
+
+        int t = fr.nextInt();
+        while (t-- > 0)
+            solve(fr, out);
+
+        out.flush();
+        out.close();
+    }
+
+    public static void solve(FastReader fr, PrintWriter out) {
+        StringBuilder sb = new StringBuilder();
+        // YOUR SOLUTION...
+
+        out.println(sb.toString().trim());
+    }
+}

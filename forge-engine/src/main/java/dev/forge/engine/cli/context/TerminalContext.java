@@ -63,6 +63,10 @@ public final class TerminalContext implements AutoCloseable {
         return terminal.getWidth();
     }
 
+    public int height() {
+        return terminal.getHeight();
+    }
+
     @Override
     public void close() {
         try {

@@ -25,6 +25,9 @@ public final class Prompter {
         LineReader reader = ctx.lineReader();
         try {
             return reader.readLine(prompt);
+        } catch (org.jline.reader.UserInterruptException e) {
+            System.exit(130);
+            return null;
         } catch (Exception e) {
             return null;
         }
@@ -237,6 +240,34 @@ public final class Prompter {
         }
     }
 
+    public <T extends Enum<T>> T chooseRequired(String question, Class<T> enumClass) {
+        if (!ctx.isInteractive())
+            throw new IllegalStateException("Required choice in non-interactive mode");
+
+        T[] values = enumClass.getEnumConstants();
+        if (values == null || values.length == 0)
+            throw new IllegalArgumentException("Provided class is not an enum or has no constants");
+
+        List<T> options = new ArrayList<>(values.length);
+        for (T value : values) {
+            options.add(value);
+        }
+
+        String opts = String.join(" | ", options.stream().map(s -> s.name()).toList());
+
+        while (true) {
+            String input = readLine(question + " [" + opts + "]: ");
+            if (input == null || input.isBlank())
+                continue;
+
+            for (var option : options)
+                if (option.name().equals(input))
+                    return option;
+
+            ForgeEngine.context().console().println("Invalid choice. Expected one of: " + opts);
+        }
+    }
+
     public <T extends Enum<T>> T chooseOrDefault(String question, T defaultValue, Class<T> enumClass) {
         if (!ctx.isInteractive())
             return defaultValue;
@@ -266,4 +297,10 @@ public final class Prompter {
         }
     }
 
+    public <T> Pageination<T> paginate(String question, Collection<T> ops) {
+        if (!ctx.isInteractive())
+            throw new IllegalStateException("Required choice in non-interactive mode");
+
+        return new Pageination<>(ops);
+    }
 }
